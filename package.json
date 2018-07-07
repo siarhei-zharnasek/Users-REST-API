@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node mocha",
+    "test": "mocha",
     "start": "nodemon index.js"
   },
   "author": "",
@@ -19,9 +19,12 @@
     "koa-router": "^7.4.0",
     "koa-static": "^5.0.0",
     "mongoose": "^5.2.1",
-    "pug": "^2.0.3"
+    "pug": "^2.0.3",
+    "request": "^2.87.0"
   },
   "devDependencies": {
-    "nodemon": "^1.17.5"
+    "mocha": "^5.2.0",
+    "nodemon": "^1.17.5",
+    "request-promise": "^4.2.2"
   }
 }
