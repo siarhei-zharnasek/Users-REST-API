@@ -16,7 +16,7 @@ const router = new Router();
 const handlers = fs.readdirSync(path.join(__dirname, 'handlers')).sort();
 handlers.forEach(handler => require('./handlers/' + handler).init(app));
 mongoose.Promise = Promise;
-mongoose.connect('mongodb://admin:admin1@ds129541.mlab.com:29541/koa-users');
+mongoose.connect('mongodb://admin:admin1@ds129541.mlab.com:29541/koa-users', { useNewUrlParser: true });
 
 router.get('/users', getUsers);
 router.get('/users/:id', getUserById);

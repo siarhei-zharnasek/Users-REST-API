@@ -45,8 +45,13 @@ module.exports.patchUsers = async ctx => {
     }
 
     try {
-        await User.update({_id: id}, {email, displayName}, {multi: true});
-        ctx.body = 'OK';
+        const opts = {
+            $set: {
+                email,
+                displayName
+            }
+        };
+        ctx.body = await User.findOneAndUpdate({_id: id}, opts, {new: true});
     } catch (err) {
         ctx.status = 400;
         ctx.body = err;

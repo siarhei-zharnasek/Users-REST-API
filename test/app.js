@@ -13,11 +13,11 @@ const requestWrapper = (method, body, param = '') => request({
     body
 });
 
-describe('RESP API app: ', async () => {
+describe('REST API app: ', async () => {
     before(done => server = app.listen(3001, done));
     after(done => server.close(done));
 
-    describe('GET /users: ', async () => {
+    describe('GET /users - ', async () => {
         let body;
         let _id;
 
@@ -43,7 +43,7 @@ describe('RESP API app: ', async () => {
         });
     });
 
-    describe('GET /users/:id: ', async () => {
+    describe('GET /users/:id - ', async () => {
         let body;
         let _id;
 
@@ -73,7 +73,7 @@ describe('RESP API app: ', async () => {
         });
     });
 
-    describe('POST /users ', async () => {
+    describe('POST /users - ', async () => {
         const email = `${Math.random()}qwe@${Math.random()}kek.ru`;
         const body = {
             email,
@@ -98,6 +98,46 @@ describe('RESP API app: ', async () => {
         it('should respond with 400 if user with such email exists', async () => {
             await requestWrapper('POST', body);
             const response = await requestWrapper('POST', body);
+            assert.equal(response.statusCode, 400);
+        });
+    });
+
+    describe('PATCH /users/:id - ', async () => {
+        let body;
+        let _id;
+
+        beforeEach(async () => {
+            const email = `${Math.random()}qwe@${Math.random()}kek.ru`;
+            body = {
+                email,
+                displayName: 'admin'
+            };
+            const addedUser = await requestWrapper('POST', body);
+            _id = addedUser.body._id;
+        });
+
+        afterEach(async () => await requestWrapper('DELETE', {}, _id));
+
+        it('should respond with existing user', async () => {
+            const newBody = {
+                email: 'test@test.com',
+                displayName: 'test'
+            };
+            const addedUser = await requestWrapper('PATCH', newBody, _id);
+
+            assert.equal(addedUser.body.email, newBody.email);
+            assert.equal(addedUser.body.displayName, newBody.displayName);
+        });
+
+        it('should respond with 400 if there is _id in body', async () => {
+            const response = await requestWrapper('PATCH', Object.assign({_id: 1}, body), _id);
+            assert.equal(response.body, 'No id allowed');
+            assert.equal(response.statusCode, 400);
+        });
+
+        it('should respond with 400 if user with such email exists', async () => {
+            const addedUser = await requestWrapper('POST', {email: `${Math.random()}qwe@${Math.random()}kek.ru`, displayName: 'test'});
+            const response = await requestWrapper('PATCH', Object.assign({}, body, {email: addedUser.body.email}), _id);
             assert.equal(response.statusCode, 400);
         });
     });
