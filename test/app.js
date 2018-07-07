@@ -72,4 +72,33 @@ describe('RESP API app: ', async () => {
             assert.equal(response.statusCode, 404);
         });
     });
+
+    describe('POST /users ', async () => {
+        const email = `${Math.random()}qwe@${Math.random()}kek.ru`;
+        const body = {
+            email,
+            displayName: 'admin'
+        };
+
+        afterEach(async () => await requestWrapper('DELETE', body));
+
+        it('should respond with existing user', async () => {
+            const addedUser = await requestWrapper('POST', body);
+
+            assert.equal(addedUser.body.email, body.email);
+            assert.equal(addedUser.body.displayName, body.displayName);
+        });
+
+        it('should respond with 400 if there is _id in body', async () => {
+            const response = await requestWrapper('POST', Object.assign({_id: 1}, body));
+            assert.equal(response.body, 'No id allowed');
+            assert.equal(response.statusCode, 400);
+        });
+
+        it('should respond with 400 if user with such email exists', async () => {
+            await requestWrapper('POST', body);
+            const response = await requestWrapper('POST', body);
+            assert.equal(response.statusCode, 400);
+        });
+    });
 });
