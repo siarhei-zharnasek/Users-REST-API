@@ -57,7 +57,7 @@ describe('REST API app: ', async () => {
             _id = addedUser.body._id;
         });
 
-        afterEach(async () => await requestWrapper('DELETE', body));
+        afterEach(async () => await requestWrapper('DELETE', {}, _id));
 
         it('should respond with existing user', async () => {
             const response = await requestWrapper('GET', {}, _id);
@@ -80,13 +80,11 @@ describe('REST API app: ', async () => {
             displayName: 'admin'
         };
 
-        afterEach(async () => await requestWrapper('DELETE', body));
-
         it('should respond with existing user', async () => {
             const addedUser = await requestWrapper('POST', body);
-
             assert.equal(addedUser.body.email, body.email);
             assert.equal(addedUser.body.displayName, body.displayName);
+            await requestWrapper('DELETE', {}, addedUser.body._id);
         });
 
         it('should respond with 400 if there is _id in body', async () => {
@@ -96,9 +94,10 @@ describe('REST API app: ', async () => {
         });
 
         it('should respond with 400 if user with such email exists', async () => {
-            await requestWrapper('POST', body);
+            const addedUser = await requestWrapper('POST', body);
             const response = await requestWrapper('POST', body);
             assert.equal(response.statusCode, 400);
+            await requestWrapper('DELETE', {}, addedUser.body._id);
         });
     });
 
@@ -139,6 +138,7 @@ describe('REST API app: ', async () => {
             const addedUser = await requestWrapper('POST', {email: `${Math.random()}qwe@${Math.random()}kek.ru`, displayName: 'test'});
             const response = await requestWrapper('PATCH', Object.assign({}, body, {email: addedUser.body.email}), _id);
             assert.equal(response.statusCode, 400);
+            await requestWrapper('DELETE', {}, addedUser.body._id)
         });
     });
 
@@ -166,6 +166,7 @@ describe('REST API app: ', async () => {
         it('should respond with 404 if there is no such user', async () => {
             const response = await requestWrapper('DELETE', {}, 'no-such-user');
             assert.equal(response.statusCode, 404);
+            await requestWrapper('DELETE', {}, _id);
         });
     });
 });
