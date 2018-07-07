@@ -6,11 +6,16 @@ module.exports.getUsers = async ctx => {
 
 module.exports.getUserById = async ctx => {
     const {id} = ctx.params;
-    const user = await User.findOne({_id: id});
 
-    if (user) {
-        ctx.body = user;
-    } else {
+    try {
+        const user = await User.findOne({_id: id});
+
+        if (user) {
+            ctx.body = user;
+        } else {
+            ctx.status = 404;
+        }
+    } catch (e) {
         ctx.status = 404;
     }
 };
